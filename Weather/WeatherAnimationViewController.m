@@ -69,9 +69,12 @@
     [self start:desc];
 }
 
+/**
+ 更新并保存图片到本地
+ **/
 - (IBAction)updateBackgroundImage:(id)sender
 {
-    NSURL *url = [NSURL URLWithString:@"http://www.raywenderlich.com/wp-content/uploads/2014/01/sunny-background.png"];
+    NSURL *url = [NSURL URLWithString:@"http://localhost/weather_app/weather.jpg"];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     
     AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
@@ -140,6 +143,7 @@
     }
     else if([[type lowercaseString] isEqualToString:@"partly cloudy"]) {
         UIImageView *iv = [self sunny:CGPointMake(100,50)];
+        //跳上跳下
         [self bounceImageView:iv];
         [self cloudy];
     }
@@ -257,7 +261,9 @@
     return imageView;
 }
 
-
+/**
+ 用一个 NSTimer 不断重复.
+ **/
 - (void)weatherItem:(NSString *)name andLevel:(CGFloat)level
 {
     if(self.generator){
@@ -267,7 +273,9 @@
     
     self.generator = [NSTimer scheduledTimerWithTimeInterval:(.1*(1/level)) target:self selector:@selector(addItem:) userInfo:name repeats:YES];
 }
-
+/**
+ 不断制造下 雪/雨 的场景
+ **/
 - (void)addItem:(NSTimer *)timer
 {
     NSString *image = timer.userInfo;
@@ -282,7 +290,12 @@
     [self tweenLeftImageView:imageView];
 }
 
-
+/**
+ x 轴 - 50
+ y 轴 + 200
+ 逐渐变为不可见
+ 最后把视图移除
+ **/
 - (void)tweenLeftImageView:(UIImageView *)iv
 {
     CGPoint point = iv.center;

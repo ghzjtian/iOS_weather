@@ -9,9 +9,10 @@
 #import "WeatherHTTPClient.h"
 
 #warning PASTE YOUR API KEY HERE
-static NSString * const WorldWeatherOnlineAPIKey = @"PASTE YOUR API KEY HERE";
+static NSString * const WorldWeatherOnlineAPIKey = @"b560308b183e472384522910181309";
 
-static NSString * const WorldWeatherOnlineURLString = @"http://api.worldweatheronline.com/free/v1/";
+//新的 URL 的数据格式已经改变了，现在仅供参考.
+static NSString * const WorldWeatherOnlineURLString = @"http://api.worldweatheronline.com/premium/v1";
 
 @implementation WeatherHTTPClient
 

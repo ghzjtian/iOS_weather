@@ -48,6 +48,11 @@ static NSString * const BaseURLString = @"http://localhost/weather_app/";
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
     self.locationManager = [[CLLocationManager alloc] init];
+    [_locationManager requestWhenInUseAuthorization];
+    // 设置定位精确度到米
+    _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    // 设置过滤器为无
+    _locationManager.distanceFilter = kCLDistanceFilterNone;
     self.locationManager.delegate = self;
 }
 
@@ -292,9 +297,7 @@ static NSString * const BaseURLString = @"http://localhost/weather_app/";
 {
     self.elementName = qName;
     
-    if([qName isEqualToString:@"current_condition"] ||
-       [qName isEqualToString:@"weather"] ||
-       [qName isEqualToString:@"request"]) {
+    if([qName isEqualToString:@"current_condition"] ||[qName isEqualToString:@"weather"] ||[qName isEqualToString:@"request"]) {
         self.currentDictionary = [NSMutableDictionary dictionary];
     }
     
@@ -312,8 +315,7 @@ static NSString * const BaseURLString = @"http://localhost/weather_app/";
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
 {
     // 1
-    if ([qName isEqualToString:@"current_condition"] ||
-        [qName isEqualToString:@"request"]) {
+    if ([qName isEqualToString:@"current_condition"] ||[qName isEqualToString:@"request"]) {
         self.xmlWeather[qName] = @[self.currentDictionary];
         self.currentDictionary = nil;
     }
@@ -336,8 +338,7 @@ static NSString * const BaseURLString = @"http://localhost/weather_app/";
         // Ignore value tags, they only appear in the two conditions below
     }
     // 4
-    else if ([qName isEqualToString:@"weatherDesc"] ||
-             [qName isEqualToString:@"weatherIconUrl"]) {
+    else if ([qName isEqualToString:@"weatherDesc"] ||[qName isEqualToString:@"weatherIconUrl"]) {
         NSDictionary *dictionary = @{@"value": self.outstring};
         NSArray *array = @[dictionary];
         self.currentDictionary[qName] = array;
@@ -411,8 +412,10 @@ static NSString * const BaseURLString = @"http://localhost/weather_app/";
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
+    
     // Last object contains the most recent location
     CLLocation *newLocation = [locations lastObject];
+    NSLog(@"newLocation:%@",newLocation);
     
     // If the location is more than 5 minutes old, ignore it
     if([newLocation.timestamp timeIntervalSinceNow] > 300)
@@ -423,6 +426,17 @@ static NSString * const BaseURLString = @"http://localhost/weather_app/";
     WeatherHTTPClient *client = [WeatherHTTPClient sharedWeatherHTTPClient];
     client.delegate = self;
     [client updateWeatherAtLocation:newLocation forNumberOfDays:5];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
+    NSLog(@"Location Error:%@",error);
+    if ([error code] == kCLErrorDenied) {
+        NSLog(@"访问被拒绝");
+    }
+    if ([error code] == kCLErrorLocationUnknown) {
+        NSLog(@"无法获取位置信息");
+    }
+    
 }
 
 #pragma mark - WeatherHTTPClientDelegate
